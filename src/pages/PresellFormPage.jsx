@@ -32,6 +32,7 @@ function PresellFormPage() {
     { value: 'en', label: 'Inglês' },
     { value: 'es', label: 'Espanhol' },
     // Adicionar mais idiomas conforme necessário
+    // TODO: Populate this list dynamically from backend langs folder?
   ];
 
   useEffect(() => {
@@ -112,48 +113,48 @@ function PresellFormPage() {
 
         <div className="mb-4">
           <label htmlFor="name" className="block text-gray-700 text-sm font-bold mb-2">Nome da Pré-venda</label>
-          <input 
-            type="text" 
-            id="name" 
-            value={name} 
-            onChange={(e) => setName(e.target.value)} 
+          <input
+            type="text"
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            required 
+            required
           />
         </div>
 
         <div className="mb-4">
           <label htmlFor="productUrl" className="block text-gray-700 text-sm font-bold mb-2">URL do Produto (para screenshot)</label>
-          <input 
-            type="url" 
-            id="productUrl" 
-            value={productUrl} 
-            onChange={(e) => setProductUrl(e.target.value)} 
+          <input
+            type="url"
+            id="productUrl"
+            value={productUrl}
+            onChange={(e) => setProductUrl(e.target.value)}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="https://www.exemploproduto.com"
-            required 
+            required
           />
         </div>
 
         <div className="mb-4">
           <label htmlFor="affiliateLink" className="block text-gray-700 text-sm font-bold mb-2">Link de Afiliado</label>
-          <input 
-            type="url" 
-            id="affiliateLink" 
-            value={affiliateLink} 
-            onChange={(e) => setAffiliateLink(e.target.value)} 
+          <input
+            type="url"
+            id="affiliateLink"
+            value={affiliateLink}
+            onChange={(e) => setAffiliateLink(e.target.value)}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="https://seu.link.afiliado.com/produto"
-            required 
+            required
           />
         </div>
 
         <div className="mb-4">
           <label htmlFor="presellType" className="block text-gray-700 text-sm font-bold mb-2">Tipo de Pré-venda</label>
-          <select 
-            id="presellType" 
-            value={presellType} 
-            onChange={(e) => setPresellType(e.target.value)} 
+          <select
+            id="presellType"
+            value={presellType}
+            onChange={(e) => setPresellType(e.target.value)}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           >
             {presellTypes.map(type => (
@@ -164,26 +165,26 @@ function PresellFormPage() {
 
         <div className="mb-4">
           <label htmlFor="languageCode" className="block text-gray-700 text-sm font-bold mb-2">Idioma da Pré-venda</label>
-          <select 
-            id="languageCode" 
-            value={languageCode} 
-            onChange={(e) => setLanguageCode(e.target.value)} 
+          <select
+            id="languageCode"
+            value={languageCode}
+            onChange={(e) => setLanguageCode(e.target.value)}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           >
             {languages.map(lang => (
               <option key={lang.value} value={lang.value}>{lang.label}</option>
             ))}
-             />
+          </select> {/* Corrected closing tag here */}
         </div>
 
         {/* New field for Custom Background Image URL */}
         <div className="mb-4">
           <label htmlFor="customBackgroundImageUrl" className="block text-gray-700 text-sm font-bold mb-2">URL da Imagem de Fundo Personalizada (Opcional)</label>
-          <input 
-            type="url" 
-            id="customBackgroundImageUrl" 
-            value={customBackgroundImageUrl} 
-            onChange={(e) => setCustomBackgroundImageUrl(e.target.value)} 
+          <input
+            type="url"
+            id="customBackgroundImageUrl"
+            value={customBackgroundImageUrl}
+            onChange={(e) => setCustomBackgroundImageUrl(e.target.value)}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="https://exemplo.com/imagem.jpg (deixe em branco para usar o padrão)"
           />
@@ -192,29 +193,29 @@ function PresellFormPage() {
 
         <div className="mb-6">
           <label htmlFor="slug" className="block text-gray-700 text-sm font-bold mb-2">Slug da URL (ex: meu-produto-incrivel)</label>
-          <input 
-            type="text" 
-            id="slug" 
-            value={slug} 
-            onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''))} 
+          <input
+            type="text"
+            id="slug"
+            value={slug}
+            onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''))}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="meu-produto-incrivel"
-            required 
+            required
           />
-        </div>div>
+        </div> {/* Corrected closing tag here */}
 
-        <div className="flex items-center justify-between">
-          <button 
-            type="submit" 
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full sm:w-auto"
+        <div className="flex items-center justify-between flex-wrap sm:flex-nowrap">
+          <button
+            type="submit"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full sm:w-auto mb-2 sm:mb-0"
             disabled={isLoading}
           >
             {isLoading ? (isEditing ? 'Atualizando...' : 'Criando...') : (isEditing ? 'Atualizar Pré-venda' : 'Criar Pré-venda')}
           </button>
-          <button 
-            type="button" 
-            onClick={() => navigate('/dashboard')} 
-            className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full sm:w-auto mt-4 sm:mt-0 sm:ml-4"
+          <button
+            type="button"
+            onClick={() => navigate('/dashboard')}
+            className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full sm:w-auto sm:ml-4"
             disabled={isLoading}
           >
             Cancelar
