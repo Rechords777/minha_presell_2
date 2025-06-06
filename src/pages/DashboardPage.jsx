@@ -1,6 +1,9 @@
-import React, { useState, useEffect } from 'react';
+'''import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { getPresells, deletePresell } from '../services/api';
+
+// Get the base API URL from environment variables
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 function DashboardPage() {
   const [presells, setPresells] = useState([]);
@@ -13,16 +16,17 @@ function DashboardPage() {
       try {
         setLoading(true);
         const data = await getPresells();
-        setPresells(data);
+        // Ensure slug is included in the fetched data
+        setPresells(data.map(p => ({ ...p, slug: p.slug || '' }))); // Add default empty slug if missing
         setError('');
       } catch (err) {
         console.error('Failed to fetch presells:', err);
         setError('Falha ao carregar as pré-vendas. Tente novamente mais tarde.');
-        // If unauthorized (e.g., token expired), redirect to login
-        if (err.response && err.response.status === 403) {
-          localStorage.removeItem('accessToken');
-          navigate('/login');
-        }
+        // If unauthorized (e.g., token expired), redirect to login (assuming no auth now)
+        // if (err.response && err.response.status === 403) {
+        //   localStorage.removeItem('accessToken');
+        //   navigate('/login');
+        // }
       } finally {
         setLoading(false);
       }
@@ -46,28 +50,38 @@ function DashboardPage() {
     navigate(`/presells/edit/${presellId}`);
   };
 
-  const handleView = (publicUrl) => {
-    if (publicUrl) {
-      // Assuming publicUrl is relative to the backend API base URL or a full URL
-      // For MVP, if it's a relative path like /static_presells/html/..., construct full URL
-      // const backendBaseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
-      // For now, let's assume it's a full URL or a path that the browser can resolve relative to the current domain if backend serves it.
-      // If the public_url is like /static_presells/..., it needs to be prefixed by the backend URL.
-      // For now, let's just open it. This might need adjustment based on actual public_url format.
-      window.open(publicUrl, '_blank');
+  const handleView = (slug) => {
+    if (!API_BASE_URL) {
+      console.error("VITE_API_BASE_URL is not defined!");
+      alert('Erro de configuração: URL base da API não encontrada.');
+      return;
+    }
+    if (slug) {
+      // Construct the full URL pointing to the backend view endpoint
+      const viewUrl = `${API_BASE_URL}/presells/view/${slug}`;
+      console.log("Opening view URL:", viewUrl); // Log the URL for debugging
+      window.open(viewUrl, '_blank');
     } else {
-      alert('URL pública não disponível.');
+      alert('Slug da pré-venda não disponível para visualização.');
     }
   };
-  
-  const handleCopyUrl = (url) => {
-    if (url) {
-      navigator.clipboard.writeText(url)
-        .then(() => alert('URL copiada para a área de transferência!'))
+
+  const handleCopyUrl = (slug) => {
+     if (!API_BASE_URL) {
+      console.error("VITE_API_BASE_URL is not defined!");
+      alert('Erro de configuração: URL base da API não encontrada para cópia.');
+      return;
+    }
+    if (slug) {
+      const viewUrl = `${API_BASE_URL}/presells/view/${slug}`;
+      navigator.clipboard.writeText(viewUrl)
+        .then(() => alert('URL de visualização copiada para a área de transferência!'))
         .catch(err => {
             console.error('Falha ao copiar URL: ', err);
             alert('Falha ao copiar URL.');
         });
+    } else {
+      alert('Slug da pré-venda não disponível para cópia.');
     }
   };
 
@@ -77,9 +91,9 @@ function DashboardPage() {
 
   return (
     <div className="container mx-auto p-4">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-700">Minhas Pré-vendas</h1>
-        <Link 
+      <div className="flex justify-between items-center mb-6 flex-wrap">
+        <h1 className="text-3xl font-bold text-gray-700 mb-4 sm:mb-0">Minhas Pré-vendas</h1>
+        <Link
           to="/presells/new"
           className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
         >
@@ -116,18 +130,19 @@ function DashboardPage() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{presell.presell_type}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{presell.language_code}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {presell.public_url ? (
-                      <button 
-                        onClick={() => handleCopyUrl(presell.public_url)} 
+                    {/* Pass slug to handleCopyUrl */}
+                    {presell.slug ? (
+                      <button
+                        onClick={() => handleCopyUrl(presell.slug)}
                         className="text-blue-600 hover:text-blue-800 underline mr-2"
-                        title="Copiar URL"
+                        title="Copiar URL de Visualização"
                       >
                         Copiar
                       </button>
                     ) : 'N/A'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span 
+                    <span
                       className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
                         ${presell.status === 'publicada' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}
                     >
@@ -135,7 +150,8 @@ function DashboardPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button onClick={() => handleView(presell.public_url)} className="text-indigo-600 hover:text-indigo-900 mr-3" title="Visualizar">
+                     {/* Pass slug to handleView */}
+                    <button onClick={() => handleView(presell.slug)} className="text-indigo-600 hover:text-indigo-900 mr-3" title="Visualizar">
                       Ver
                     </button>
                     <button onClick={() => handleEdit(presell.id)} className="text-yellow-600 hover:text-yellow-900 mr-3" title="Editar">
@@ -156,4 +172,4 @@ function DashboardPage() {
 }
 
 export default DashboardPage;
-
+'''
